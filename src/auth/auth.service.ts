@@ -6,11 +6,16 @@ import { User } from 'src/users/schemas/users.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    private readonly jwtService: JwtService,
+  
+  ) { }
 
 
   async register(userDto: CreateAuthDto): Promise<{ userId: any; email: string;  }> {
@@ -34,6 +39,20 @@ export class AuthService {
   
     const User = await CreateUser.save();
     return { userId: User._id, email: User.email };
+  }
+
+
+  async login(email: string, password: string): Promise<string>{
+    const user = await this.userModel.findOne({email})
+    if(!email){
+      throw { statusCode: 400, message: 'User with this email dosn\'t exists' };
+    }
+    const PasswordCompare = await bcrypt.compare(password, user.password)
+    if (!PasswordCompare) {
+      throw { statusCode: 400, message: 'Invalid Password' };
+    }
+    return this.jwtService.sign({ email: user.email, userId: user._id });
+
   }
   
 
