@@ -15,4 +15,13 @@ export class AuthController {
       user: newUser,
     };
   }
+
+  @Post('/login')
+  async login(
+    @Body('email') email:string,
+    @Body('password') password: string,
+  ){
+    const token = await this.authService.login(email, password)
+    return {message: 'Login success', token}
+  }
 }
