@@ -12,6 +12,7 @@ import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { JwtAuth } from '../guard/auth.guard'
+import { ObjectId } from 'mongoose';
 
 @Controller('event')
 //@UseGuards(JwtAuth)
@@ -22,6 +23,13 @@ export class EventController {
   create(@Body() createEventDto: CreateEventDto) {
     console.log('Received DTO:', createEventDto); 
     return this.eventService.create(createEventDto);
+  }
+
+
+  @Post('add_user')
+  async addNewUser(@Body() body: { eventId: ObjectId; userId: ObjectId }) {
+    const { eventId, userId } = body;
+    return this.eventService.addMember(eventId, userId);
   }
 
   // @Get()
@@ -39,8 +47,8 @@ export class EventController {
   //   return this.eventService.update(+id, updateEventDto);
   // }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.eventService.remove(+id);
-  // }
+  @Delete('remove/:eventId')
+  async remove(@Param('eventId') eventId: ObjectId) {
+    return this.eventService.remove(eventId); 
+  }
 }

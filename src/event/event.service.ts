@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { eventDocument, Event } from './schemas/event.schema';
 
 @Injectable()
@@ -32,7 +32,26 @@ export class EventService {
   }
 
 
+  async addMember(eventId: ObjectId, userId: ObjectId): Promise<any> {
+    const event = await this.eventModel.findById(eventId);
   
+    if (!event) {
+      throw new Error('Event not found'); 
+    }
+  
+    if (event.members.includes(userId)) {
+      return {
+        message: 'User is already a member of the event',
+      };
+    }
+      event.members.push(userId);
+      await event.save();
+  
+    return {
+      message: 'Member added successfully',
+      event,
+    };
+  }
   
 
   findAll() {
@@ -47,7 +66,14 @@ export class EventService {
     return `This action updates a #${id} event`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} event`;
+  async remove(eventId: ObjectId): Promise<any> {
+    const deletedEvent = await this.eventModel.findByIdAndDelete(eventId);
+    if (!deletedEvent) {
+      throw new Error('Event not found');
+    }
+    return {
+      message: 'Event deleted successfully',
+      deletedEvent,
+    };
   }
 }
