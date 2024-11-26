@@ -66,5 +66,14 @@ export class EventService {
     return `This action updates a #${id} event`;
   }
 
-  
+  async remove(eventId: ObjectId): Promise<any> {
+    const deletedEvent = await this.eventModel.findByIdAndDelete(eventId);
+    if (!deletedEvent) {
+      throw new Error('Event not found');
+    }
+    return {
+      message: 'Event deleted successfully',
+      deletedEvent,
+    };
+  }
 }
