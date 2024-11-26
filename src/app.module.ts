@@ -10,7 +10,8 @@ import { EventModule } from './event/event.module';
   imports: [
     MongooseModule.forRoot(process.env.Mongo_URI || 'mongodb://localhost:27017/systeme_gestion_event'),
     AuthModule, 
-    UsersModule, EventModule],
+    UsersModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
