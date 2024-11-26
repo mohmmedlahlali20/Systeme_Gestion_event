@@ -51,7 +51,7 @@ export class AuthService {
     if (!PasswordCompare) {
       throw { statusCode: 400, message: 'Invalid Password' };
     }
-    return this.jwtService.sign({ email: user.email, userId: user._id });
+    return this.jwtService.sign({ email: user.email, userId: user._id, role: user.role });
 
   }
   
