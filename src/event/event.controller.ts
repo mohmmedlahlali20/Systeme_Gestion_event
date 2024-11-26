@@ -47,5 +47,8 @@ export class EventController {
   //   return this.eventService.update(+id, updateEventDto);
   // }
 
-  
+  @Delete('remove/:eventId')
+  async remove(@Param('eventId') eventId: ObjectId) {
+    return this.eventService.remove(eventId); 
+  }
 }
