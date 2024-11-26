@@ -16,8 +16,7 @@ export class Event {
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
     members: mongoose.Schema.Types.ObjectId[];
 
-    @Prop({ required: true })
-    Date: Date
+ 
 
     @Prop({ default: Date.now })
     created_At: Date;
