@@ -1,33 +1,36 @@
-import { 
-    CanActivate, 
-    ExecutionContext, 
-    Injectable, 
-    UnauthorizedException 
-} from "@nestjs/common";
-import { Observable } from "rxjs";
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+import * as process from 'node:process';
 
 @Injectable()
 export class JwtAuth implements CanActivate {
-    canActivate(
-        context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
+    canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest();
         const authHeader = request.headers['authorization'];
+
         if (!authHeader) {
-            throw new UnauthorizedException('No token provided');
+            throw new Error('No token provided');
         }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            throw new Error('Malformed authorization header');
+        }
+
         try {
-            const token = authHeader.split(' ')[1];
-            if (!token) {
-                throw new UnauthorizedException('Token not found');
-            }
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const secret = process.env.JWT_SECRET || 'superKeyScurize';
+
+            console.log('Using Secret:', secret);
+            console.log('Token:', token);
+
+            const decoded = jwt.verify(token, secret);
+            console.log('Decoded Token:', decoded);
+
             request.user = decoded;
-            console.log(decoded);
             return true;
         } catch (err) {
-            throw new UnauthorizedException('Invalid token');
+            console.error('JWT Verification Error:', err.message);
+            throw new Error(err.message);
         }
     }
 }
