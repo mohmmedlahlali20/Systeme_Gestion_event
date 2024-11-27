@@ -15,7 +15,7 @@ import { JwtAuth } from '../guard/auth.guard'
 import { ObjectId } from 'mongoose';
 
 @Controller('event')
-//@UseGuards(JwtAuth)
+@UseGuards(JwtAuth)
 export class EventController {
   constructor(private  eventService: EventService) { }
 
