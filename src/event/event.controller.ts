@@ -32,23 +32,36 @@ export class EventController {
     return this.eventService.addMember(eventId, userId);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.eventService.findAll();
-  // }
+  @Get('getAllEvent')
+  findAll() {
+    return this.eventService.findAll();
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.eventService.findOne(+id);
-  // }
+  @Get(':eventId')
+  findOne(@Param('eventId') eventId: string) {
+    return this.eventService.findOne(eventId);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-  //   return this.eventService.update(+id, updateEventDto);
-  // }
+  @Patch(':eventId')
+  async updateEvent(
+    @Param('eventId') eventId: string,
+    @Body() updateEventDto: UpdateEventDto,
+  ): Promise<any> {
+    console.log(updateEventDto);
+    
+    return this.eventService.updateEvent(eventId, updateEventDto);
+  }
 
   @Delete('remove/:eventId')
   async remove(@Param('eventId') eventId: ObjectId) {
     return this.eventService.remove(eventId); 
   }
+
+
+
+  @Patch('remove/member/:eventId')
+  async removeMember(@Param('eventId') eventId: string, @Body('userId') userId: string) {
+    return this.eventService.removeMemberFromEvent(userId, eventId);
+  }
+  
 }
