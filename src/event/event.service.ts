@@ -18,18 +18,24 @@ export class EventService {
 
 
   async create(createEventDto: CreateEventDto): Promise<any> {
-    const { Title, Description, Members } = createEventDto
+    const { Title, Description, Members, location, Date } = createEventDto;
+  
     const createEvent = new this.eventModel({
       Title,
       Description,
       Members,
-    })
+      location,
+      Date 
+    });
+  
     const newEvent = await createEvent.save();
     return {
-      message: "event created success",
+      message: "Event created successfully",
       newEvent
-    }
+    };
   }
+  
+  
 
 
   async updateEvent(eventId: string, updateEventDto: UpdateEventDto): Promise<any> {
