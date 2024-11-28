@@ -1,4 +1,5 @@
-import { IsArray, IsDate, IsDateString, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 
 
@@ -14,11 +15,17 @@ export class CreateEventDto {
 
 
     @IsArray()
+    Members: string[];
+
+
+
+    @IsString()
+    Date: Date;
+
+    @IsString()
     @IsNotEmpty()
-    Members: string[]; 
+    location: string
 
 
- 
- 
 
 }
