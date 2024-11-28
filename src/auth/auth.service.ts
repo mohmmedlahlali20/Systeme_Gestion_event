@@ -43,7 +43,7 @@ export class AuthService {
   }
 
 
-  async login(email: string, password: string): Promise<string> {
+  async login(email: string, password: string): Promise<{token: string, user: User}> {
     const user = await this.userModel.findOne({ email })
     if (!email) {
       throw { statusCode: 400, message: 'User with this email dosn\'t exists' };
@@ -55,9 +55,8 @@ export class AuthService {
     const token = jwt.sign(
       { email: user.email, userId: user._id, role: user.role },
       process.env.JWT_SECRET || 'superKeyScurize',
-      { expiresIn: '1h' },
     );
-     return token;
+     return {token:token, user:user};
 
   }
 
