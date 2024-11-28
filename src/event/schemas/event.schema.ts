@@ -16,13 +16,12 @@ export class Event {
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
     members: mongoose.Schema.Types.ObjectId[];
 
- 
+    @Prop({required: true})
+    location: string;
 
-    @Prop({ default: Date.now })
-    created_At: Date;
+    @Prop({ type: String }) 
+    Date: string
 
-    @Prop({ default: Date.now })
-    update_At: Date;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
