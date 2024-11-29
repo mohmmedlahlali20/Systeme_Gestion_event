@@ -64,5 +64,11 @@ export class EventController {
   async removeMember(@Param('eventId') eventId: string, @Body('userId') userId: string) {
     return this.eventService.removeMemberFromEvent(userId, eventId);
   }
+
+  @Get('eventsUser/:userId')
+  async getAllEventsByUserId(@Param('userId') userId: string) {
+    return this.eventService.getEventByUserId(userId);
+  }
+
   
 }
