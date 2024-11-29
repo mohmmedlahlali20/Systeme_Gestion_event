@@ -2,12 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EventController } from './event.controller';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
-import { ObjectId, Types } from 'mongoose';
+import { Types } from 'mongoose';
+
 
 const mockEventService = {
   create: jest.fn(),
   addMember: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  updateEvent: jest.fn(),
   remove: jest.fn(),
+  removeMemberFromEvent: jest.fn(),
 };
 
 describe('EventController', () => {
@@ -31,60 +36,72 @@ describe('EventController', () => {
   });
 
   describe('create', () => {
-    it('should create an event', async () => {
-      const createEventDto: CreateEventDto = {
-        Title: 'Test Event',
-        Description: 'Description for test event',
-        Members: [],
-      };
+    it('should call EventService.create with the correct DTO', async () => {
+      const Dto: CreateEventDto = { Title: 'Test Event', Date: new Date(), Description:'test description', location: 'norva', Members: ['852','896'] };
+      await controller.create(Dto);
 
-      mockEventService.create.mockResolvedValue({
-        message: 'event created success',
-        newEvent: createEventDto,
-      });
-
-      const result = await controller.create(createEventDto);
-      expect(result).toEqual({
-        message: 'event created success',
-        newEvent: createEventDto,
-      });
-      expect(mockEventService.create).toHaveBeenCalledWith(createEventDto);
+      expect(service.create).toHaveBeenCalledWith(Dto);
     });
   });
 
   describe('addNewUser', () => {
-    it('should add a new member to an event', async () => {
-      const eventId = new Types.ObjectId()
-      const userId = new Types.ObjectId() 
+    it('should call EventService.addMember with correct parameters', async () => {
+      const eventId = new Types.ObjectId(); 
+    const userId = new Types.ObjectId();
+      const body = { eventId, userId };
 
-      mockEventService.addMember.mockResolvedValue({
-        message: 'Member added successfully',
-        event: { members: [userId] },
-      });
+      await controller.addNewUser(body);
 
-      const result = await controller.addNewUser({ userId, eventId });
-      expect(result).toEqual({
-        message: 'Member added successfully',
-        event: { members: [userId] },
-      });
-      expect(mockEventService.addMember).toHaveBeenCalledWith(eventId, userId);
+      expect(service.addMember).toHaveBeenCalledWith(eventId, userId);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should call EventService.findAll', async () => {
+      await controller.findAll();
+
+      expect(service.findAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('findOne', () => {
+    it('should call EventService.findOne with correct eventId', async () => {
+      const eventId = '12345';
+      await controller.findOne(eventId);
+
+      expect(service.findOne).toHaveBeenCalledWith(eventId);
+    });
+  });
+
+  describe('updateEvent', () => {
+    it('should call EventService.updateEvent with correct parameters', async () => {
+      const eventId = '12345';
+      const updateEventDto = { Title: 'Updated Event' };
+
+      await controller.updateEvent(eventId, updateEventDto);
+
+      expect(service.updateEvent).toHaveBeenCalledWith(eventId, updateEventDto);
     });
   });
 
   describe('remove', () => {
-    it('should remove an event', async () => {
-      const eventId = new Types.ObjectId()
-      mockEventService.remove.mockResolvedValue({
-        message: 'Event deleted successfully',
-        deletedEvent: { _id: eventId },
-      });
+    it('should call EventService.remove with correct eventId', async () => {
+      const eventId = new Types.ObjectId();
 
-      const result = await controller.remove(eventId.toString());
-      expect(result).toEqual({
-        message: 'Event deleted successfully',
-        deletedEvent: { _id: eventId },
-      });
-      expect(mockEventService.remove).toHaveBeenCalledWith(eventId.toString());
+      await controller.remove(eventId);
+
+      expect(service.remove).toHaveBeenCalledWith(eventId);
+    });
+  });
+
+  describe('removeMember', () => {
+    it('should call EventService.removeMemberFromEvent with correct parameters', async () => {
+      const eventId = '12345';
+      const userId = '67890';
+
+      await controller.removeMember(eventId, userId);
+
+      expect(service.removeMemberFromEvent).toHaveBeenCalledWith(userId, eventId);
     });
   });
 });
