@@ -1,31 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { AuthController } from 'src/auth/auth.controller'; 
+import { AuthService } from 'src/auth/auth.service'; 
 import { getModelToken } from '@nestjs/mongoose';
+import { User } from 'src/users/schemas/users.schema';
+import { Role } from 'src/auth/dto/create-auth.dto'; 
 
-import { User } from '../users/schemas/users.schema';
-import { Role } from './dto/create-auth.dto';
 
-describe('AuthService', () => {
-  let authService: AuthService;
-  let mockUserModel: any;
+const mockUserModel = {
+  findOne: jest.fn(),
+  create: jest.fn(),
+};
 
-  const mockUser = {
-    _id: 'mockUserId',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'test@example.com',
-    password: 'hashedPassword',
-    role: 'user',
+const mockAuthService = {
+  register: jest.fn(),
+  login: jest.fn(),
+};
+
+describe('AuthController', () => {
+  let controller: AuthController;
+  let service: AuthService;
+
+  const mockUserModel = {
+    find: jest.fn().mockResolvedValue([]),
+    create: jest.fn().mockResolvedValue({}),
   };
 
   beforeEach(async () => {
-    mockUserModel = {
-      findOne: jest.fn(),
-      create: jest.fn(),
-      save: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [AuthController], 
       providers: [
         AuthService,
         {
@@ -35,42 +37,91 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    authService = module.get<AuthService>(AuthService);
+    controller = module.get<AuthController>(AuthController); 
+    service = module.get<AuthService>(AuthService);
   });
 
-  it('should create a new user if email is not taken', async () => {
-    mockUserModel.findOne.mockResolvedValue(null);
-    mockUserModel.create.mockResolvedValue(mockUser);
-
-    const userDto = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'test@example.com',
-      password: 'password123',
-      role: Role.User,
-    };
-
-    const result = await authService.register(userDto);
-
-    expect(mockUserModel.findOne).toHaveBeenCalledWith({ email: userDto.email });
-    expect(mockUserModel.create).toHaveBeenCalledWith(expect.objectContaining({
-      firstName: userDto.firstName,
-      email: userDto.email,
-    }));
-    expect(result).toEqual(mockUser);
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
   });
 
-  it('should throw an error if email is already taken', async () => {
-    mockUserModel.findOne.mockResolvedValue(mockUser);
+  describe('register', () => {
+    it('should call AuthService.register and return a success message', async () => {
+      const userDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'test@example.com',
+        password: 'password123',
+        role: Role.User, 
+      };
 
-    const userDto = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'test@example.com',
-      password: 'password123',
-      role: Role.User,
-    };
+      const mockUser = {
+        _id: 'mockUserId',
+        firstName: userDto.firstName,
+        email: userDto.email,
+        password: 'hashedPassword',
+        role: userDto.role,
+      };
 
-    await expect(authService.register(userDto)).rejects.toThrow('User with this email already exists');
+      mockAuthService.register.mockResolvedValue(mockUser);
+
+      const result = await controller.register(userDto);
+
+      expect(mockAuthService.register).toHaveBeenCalledWith(userDto);
+      expect(result).toEqual({
+        message: 'User created successfully',
+        user: mockUser,
+      });
+    });
+
+    it('should throw an error if the user email already exists', async () => {
+      const userDto = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'test@example.com',
+        password: 'password123',
+        role: Role.User,
+      };
+
+      mockAuthService.register.mockRejectedValue(new Error('User with this email already exists'));
+
+      await expect(controller.register(userDto)).rejects.toThrow(
+        'User with this email already exists',
+      );
+    });
+  });
+
+  describe('login', () => {
+    it('should call AuthService.login and return a token', async () => {
+      const loginDto = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
+
+      const mockToken = 'mockJwtToken';
+
+      mockAuthService.login.mockResolvedValue({ token: mockToken, user: {} });
+
+      const result = await controller.login(loginDto.email, loginDto.password);
+
+      expect(mockAuthService.login).toHaveBeenCalledWith(loginDto.email, loginDto.password);
+      expect(result).toEqual({
+        message: 'Login success',
+        token: mockToken,
+      });
+    });
+
+    it('should throw an error if the login fails', async () => {
+      const loginDto = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
+
+      mockAuthService.login.mockRejectedValue(new Error('Invalid credentials'));
+
+      await expect(controller.login(loginDto.email, loginDto.password)).rejects.toThrow(
+        'Invalid credentials',
+      );
+    });
   });
 });

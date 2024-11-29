@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventController } from './event.controller';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { Types } from 'mongoose';
-
+import { EventController } from './event.controller';
 
 const mockEventService = {
   create: jest.fn(),
@@ -37,7 +36,7 @@ describe('EventController', () => {
 
   describe('create', () => {
     it('should call EventService.create with the correct DTO', async () => {
-      const Dto: CreateEventDto = { Title: 'Test Event', Date: new Date(), Description:'test description', location: 'norva', Members: ['852','896'] };
+      const Dto: CreateEventDto = { Title: 'Test Event', Date: new Date(), Description: 'test description', location: 'norva', Members: ['852', '896'] };
       await controller.create(Dto);
 
       expect(service.create).toHaveBeenCalledWith(Dto);
@@ -46,13 +45,13 @@ describe('EventController', () => {
 
   describe('addNewUser', () => {
     it('should call EventService.addMember with correct parameters', async () => {
-      const eventId = new Types.ObjectId(); 
-    const userId = new Types.ObjectId();
-      const body = { eventId, userId };
+      const eventId = new Types.ObjectId();
+      const userIds = [new Types.ObjectId(), new Types.ObjectId()];
+      const body = { eventId, userIds };
 
       await controller.addNewUser(body);
 
-      expect(service.addMember).toHaveBeenCalledWith(eventId, userId);
+      expect(service.addMember).toHaveBeenCalledWith(eventId, userIds);
     });
   });
 
