@@ -27,9 +27,10 @@ export class EventController {
 
 
   @Post('add_user')
-  async addNewUser(@Body() body: { eventId: ObjectId; userId: ObjectId }) {
-    const { eventId, userId } = body;
-    return this.eventService.addMember(eventId, userId);
+  async addNewUser(@Body() body: { eventId: string; userIds: string[] }) {
+    const { eventId, userIds } = body;
+    console.log(userIds)
+    return this.eventService.addMember(eventId, userIds);
   }
 
   @Get('getAllEvent')
