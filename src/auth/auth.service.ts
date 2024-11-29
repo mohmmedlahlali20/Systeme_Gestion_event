@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CreateAuthDto, Role } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../users/schemas/users.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import * as process from 'node:process';
@@ -19,32 +19,36 @@ export class AuthService {
   ) { }
 
 
-  async register(userDto: CreateAuthDto): Promise<{ userId: any; email: string; }> {
+  async register(userDto: CreateAuthDto): Promise<any> {
     const { firstName, lastName, email, password, role } = userDto;
 
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) {
-      throw { statusCode: 400, message: 'User with this email already exists' };
+      throw new Error('User with this email already exists');
     }
-
+    
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userRole = role || 'user';
-
-    const CreateUser = new this.userModel({
+    const userRole = role || 'User';
+    const CreateUser = await this.userModel.create({
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password:hashedPassword ,
       role: userRole,
     });
 
-    const User = await CreateUser.save();
-    return { userId: User._id, email: User.email };
+    return  CreateUser.save();
+
   }
 
 
-  async login(email: string, password: string): Promise<{token: string, user: User}> {
+  async login(email: string, password: string): Promise<{ token: string, user: User }> {
     const user = await this.userModel.findOne({ email })
+
+    if (!user) {
+      throw new Error('User with this email doesn\'t exist');
+    }
+    
     if (!email) {
       throw { statusCode: 400, message: 'User with this email dosn\'t exists' };
     }
@@ -56,7 +60,7 @@ export class AuthService {
       { email: user.email, userId: user._id, role: user.role },
       process.env.JWT_SECRET || 'superKeyScurize',
     );
-     return {token:token, user:user};
+    return { token: token, user: user };
 
   }
 
