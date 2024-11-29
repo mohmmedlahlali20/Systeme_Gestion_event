@@ -4,6 +4,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId, Types } from 'mongoose';
 import { eventDocument, Event } from './schemas/event.schema';
+import { log } from 'console';
 
 @Injectable()
 export class EventService {
@@ -46,27 +47,36 @@ export class EventService {
   }
 
 
-  async addMember(eventId: ObjectId, userId: ObjectId): Promise<any> {
-    const event = await this.eventModel.findById(eventId);
 
+  async addMember(eventId: string, userIds: string[]): Promise<any> {
+ 
+      const objectIdUserIds = userIds.map(userId => new Types.ObjectId(userId));
+  
+    const event = await this.eventModel.findById(eventId);
+  
     if (!event) {
       throw new Error('Event not found');
     }
-
-    if (event.members.includes(userId)) {
+  
+    const existingMembers = objectIdUserIds.filter(userId => event.members.includes(userId));
+  
+    if (existingMembers.length > 0) {
       return {
-        message: 'User is already a member of the event',
+        message: `User(s) [${existingMembers.join(', ')}] is/are already a member(s) of the event.`,
       };
     }
-    event.members.push(userId);
+  
+    event.members.push(...objectIdUserIds);
+  
     await event.save();
-
+  
     return {
-      message: 'Member added successfully',
+      message: 'Member(s) added successfully',
       event,
     };
   }
-
+  
+  
 
   async removeMemberFromEvent(userId: string, eventId: string): Promise<any> {
     const event = await this.eventModel.findById(eventId);
