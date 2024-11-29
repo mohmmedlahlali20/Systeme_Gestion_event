@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -126,4 +126,18 @@ export class EventService {
       deletedEvent,
     };
   }
+
+
+  async getEventByUserId(userId: string): Promise<Event[]> {
+    const userObjectId = new Types.ObjectId(userId);
+
+    const events = await this.eventModel.find({ members: userObjectId });
+
+    if (!events || events.length === 0) {
+      throw new NotFoundException(`No events found for user with ID ${userId}`);
+    }
+
+    return events;
+  }
+  
 }
