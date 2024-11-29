@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 
 export type eventDocument = Event & Document
@@ -13,8 +13,8 @@ export class Event {
     @Prop({ required: true })
     Description: string;
 
-    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
-    members: mongoose.Schema.Types.ObjectId[];
+    @Prop({ type: [{ type: Types.ObjectId, ref: "User" }] })
+    members: Types.ObjectId[];
 
     @Prop({required: true})
     location: string;
