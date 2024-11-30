@@ -20,81 +20,83 @@ export class EventService {
 
   async create(createEventDto: CreateEventDto): Promise<any> {
     const { Title, Description, Members, location, Date } = createEventDto;
-  
+
     const createEvent = new this.eventModel({
       Title,
       Description,
       Members,
       location,
-      Date 
+      Date
     });
-  
+
     const newEvent = await createEvent.save();
     return {
       message: "Event created successfully",
       newEvent
     };
   }
-  
-  
 
 
-  async updateEvent(eventId: string, updateEventDto: UpdateEventDto): Promise<any> {
-    const event = await this.eventModel.findByIdAndUpdate(eventId, updateEventDto, {
-      new: true,
-    });
+
+
+  async updateEvent(eventId: string, updateEventDto: UpdateEventDto): Promise<any> {    
+    const event = await this.eventModel.findByIdAndUpdate(
+      eventId,
+      updateEventDto,
+      { new: true, }
+    );
     return event;
   }
 
 
 
   async addMember(eventId: string, userIds: string[]): Promise<any> {
- 
-      const objectIdUserIds = userIds.map(userId => new Types.ObjectId(userId));
-  
+
+    const objectIdUserIds = userIds.map(userId => new Types.ObjectId(userId));
+
     const event = await this.eventModel.findById(eventId);
-  
+
     if (!event) {
       throw new Error('Event not found');
     }
-  
+
     const existingMembers = objectIdUserIds.filter(userId => event.members.includes(userId));
-  
+
     if (existingMembers.length > 0) {
       return {
         message: `User(s) [${existingMembers.join(', ')}] is/are already a member(s) of the event.`,
       };
     }
-  
+
     event.members.push(...objectIdUserIds);
-  
+
     await event.save();
-  
+
     return {
       message: 'Member(s) added successfully',
       event,
     };
   }
-  
-  
+
+
 
   async removeMemberFromEvent(userId: string, eventId: string): Promise<any> {
     const event = await this.eventModel.findById(eventId);
-  
+
     if (!event) {
       return { message: `No event found with id: ${eventId}` };
     }
-  
+
     const userObjectId = new Types.ObjectId(userId);
-  
+
     event.members = event.members.filter(member => member.toString() !== userObjectId.toString());
-  
+
     await event.save();
-  
+
     return { message: `User with id: ${userId} removed from event.` };
   }
-  
-  
+
+
 
 
   async findAll(): Promise<Event[]> {
@@ -139,5 +141,5 @@ export class EventService {
 
     return events;
   }
-  
+
 }

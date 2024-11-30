@@ -47,10 +47,15 @@ export class EventController {
   async updateEvent(
     @Param('eventId') eventId: string,
     @Body() updateEventDto: UpdateEventDto,
-  ): Promise<any> {
+  ): Promise<any> {    
+    console.log('====================================');
     console.log(updateEventDto);
+    console.log('====================================');
+    const UpdateEvents = this.eventService.updateEvent(eventId, updateEventDto);
+    console.log('Updated Event:', UpdateEvents);
+
+    return UpdateEvents
     
-    return this.eventService.updateEvent(eventId, updateEventDto);
   }
 
   @Delete('remove/:eventId')
