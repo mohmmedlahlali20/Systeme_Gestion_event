@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 
 
@@ -19,7 +19,7 @@ export class CreateEventDto {
 
 
 
-    @IsString()
+    @IsDateString()
     Date: Date;
 
     @IsString()
