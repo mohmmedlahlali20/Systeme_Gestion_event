@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: C:/Users/mohmm/OneDrive/Desktop/js/Gestion_Event
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+
+  backend:
+    build:
+      context: C:/Users/mohmm/OneDrive/Desktop/js/systeme_gestion_event
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/systeme_gestion_event
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

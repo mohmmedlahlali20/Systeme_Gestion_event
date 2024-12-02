@@ -48,9 +48,6 @@ export class EventController {
     @Param('eventId') eventId: string,
     @Body() updateEventDto: UpdateEventDto,
   ): Promise<any> {    
-    console.log('====================================');
-    console.log(updateEventDto);
-    console.log('====================================');
     const UpdateEvents = this.eventService.updateEvent(eventId, updateEventDto);
     console.log('Updated Event:', UpdateEvents);
 
@@ -59,7 +56,7 @@ export class EventController {
   }
 
   @Delete('remove/:eventId')
-  async remove(@Param('eventId') eventId: ObjectId) {
+  async remove(@Param('eventId') eventId: string) {
     return this.eventService.remove(eventId); 
   }
 
