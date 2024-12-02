@@ -8,8 +8,7 @@ services:
       - "5173:5173"
     depends_on:
       - backend
-    environment:
-      VITE_API_URL: http://backend:3000
+
 
   backend:
     build:
@@ -23,7 +22,7 @@ services:
       - mongo
 
   mongo:
-    image: mongo:5.0
+    image: mongo:latest
     container_name: mongodb
     ports:
       - "27017:27017"
