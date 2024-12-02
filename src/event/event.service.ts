@@ -136,7 +136,7 @@ export class EventService {
     const events = await this.eventModel.find({ members: userObjectId });
 
     if (!events || events.length === 0) {
-      throw new NotFoundException(`No events found for user with ID ${userId}`);
+      throw new NotFoundException(`No events found for You`);
     }
 
     return events;
