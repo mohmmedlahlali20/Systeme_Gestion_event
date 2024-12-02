@@ -32,7 +32,7 @@ describe('EventController', () => {
       Description: 'Event Description',
       Members: ['memberId1', 'memberId2'],
       location: 'Event Location',
-      Date: new Date('2024-11-30T10:00:00Z'),
+      Date:'2024-11-30T10:00:00Z'
     };
 
     const serviceCreateSpy = jest.spyOn(service, 'create').mockResolvedValue({
